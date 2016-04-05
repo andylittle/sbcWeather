@@ -48,7 +48,7 @@ precip_pulse_stop_time = 0
 
 # Wind speed
 wind_10m_multiplier = float(4.02336) / float(8)  # km/h
-wind_10m_GPIO_port = 22
+wind_10m_GPIO_port = 24
 
 # Wind Direction
 wind_dir_channel = 0
@@ -204,7 +204,7 @@ while True:
     # Get wind speed and three second peak. (WMO standard)
     windspd_10m, windspd_peak_10m = get_10m_wind_speed()
     if windspd_10m < 0.01:  # Wind speed is zero
-        winddir_10m = None
+        winddir_10m = winddir_10m # set to None to have 0 dir
     # Get Precip
     precip_sfc = get_precip()
     # Get System temperature
