@@ -20,6 +20,7 @@ import time
 import datetime
 from time import strftime, localtime
 import Adafruit_BMP.BMP085 as BMP085
+import Adafruit_DHT
 #import sht21
 import Adafruit_ADS1x15
 
@@ -41,6 +42,9 @@ precip_pulse_start_time = 0
 precip_pulse_stop_time = 0
 
 # ------------------CONFIGURATION--------------------------
+# temp humidity
+temp_humi_GPIO_port = 4
+temp_sensor = Adafruit_DHT.DHT22
 # pressure
 #pres_mode = 1  # (0 ultralow power, 1 std, 2 high res, 3 ultrahigh res)
 #bmp = BMP085(0x77, pres_mode)  # BMP085 and BMP180 are identical
@@ -105,15 +109,8 @@ GPIO.add_event_detect(precip_port,
 
 # function to get data from SHT25.
 def get_sfc_temprh():
-    # Sample temp/rh ever 2 seconds. Alternate measurements.
     global temp, rh
-    if (math.floor(time.time()) % 2) == 0:
-        temp = sht21.SHT21(1).read_temperature()
-    else:
-        rh = sht21.SHT21(1).read_humidity()
-        if (rh > 100):
-            rh = 100
-
+    rh, temp = Adafruit_DHT.read_retry(Adafruit_DHT.DHT22, temp_humi_GPIO_port)
     return temp, rh
 
 
@@ -196,7 +193,7 @@ while True:
     datetime = strftime("%Y-%m-%d %H:%M:%S", localtime())
 
     # Get Temperature and Humidity
-    ##temperature_sfc, humidity_sfc = get_sfc_temprh()
+    temperature_sfc, humidity_sfc = get_sfc_temprh()
     # Get Pressure
     ##pressure_sfc = get_sfc_pres()
     # Get Wind Direction
@@ -220,8 +217,6 @@ while True:
 
 #   Build data string
 
-    temperature_sfc = 0
-    humidity_sfc = 0
 
 
     data = "%s,%s,%s,%s,%s,%s,%s,%s,%s\n" % (
@@ -231,6 +226,7 @@ while True:
            system_temp, windspd_peak_10m)
     filename = time.strftime("%Y-%m-%d")
 
+    #print round(temperature_sfc, 1) round to one place
 #   Write data to archive
     log = open('/root/' + filename + '.csv', 'a')
     log.write(data)
