@@ -51,7 +51,8 @@ temp_sensor = Adafruit_DHT.DHT22
 
 
 # Wind speed
-wind_10m_multiplier = float(4.02336) / float(8)  # km/h
+#wind_10m_multiplier = float(4.02336) / float(8)  # km/h
+wind_10m_multiplier = float(4.02336) / float(1)  # km/h
 wind_10m_GPIO_port = 24
 
 # Wind Direction
