@@ -111,7 +111,8 @@ GPIO.add_event_detect(precip_port,
 # function to get data from SHT25.
 def get_sfc_temprh():
     global temp, rh
-    rh, temp = Adafruit_DHT.read_retry(Adafruit_DHT.DHT22, temp_humi_GPIO_port)
+    rh, ctemp = Adafruit_DHT.read_retry(Adafruit_DHT.DHT22, temp_humi_GPIO_port)
+    temp = 9.0/5.0 * ctemp + 32
     return temp, rh
 
 
@@ -217,23 +218,36 @@ while True:
         sleep_time = math.ceil(end_time) - end_time
 
 #   Build data string
+    
+    pressure_sfc = 0
+    solar_sfc = 0
+    total_lightning = 0
+    lightning_distance = 0	
 
 
-
-    data = "%s,%s,%s,%s,%s,%s,%s,%s,%s\n" % (
-           datetime, windspd_10m,
+    data = "datetime=%s \nbarometer=%s \nwindSpeed=%s \nwindDir=%s \noutTemp=%s \noutHumidity=%s \nrain=%s \ntotal_lightning=%s \nlightning_distance=%s \nUV=%s \nproc_time=%s \nsystem_temp=%s \nwindGust=%s \n" % (
+           datetime, pressure_sfc, windspd_10m,
            winddir_10m, temperature_sfc, humidity_sfc,
-           precip_sfc, proc_time, 
-           system_temp, windspd_peak_10m)
+           precip_sfc, total_lightning, lightning_distance,
+           solar_sfc, proc_time, system_temp, windspd_peak_10m)
+
+
+#   data = "%s,%s,%s,%s,%s,%s,%s,%s,%s\n" % (
+#           datetime, windspd_10m,
+#           winddir_10m, temperature_sfc, humidity_sfc,
+#           precip_sfc, proc_time, 
+#           system_temp, windspd_peak_10m)
     filename = time.strftime("%Y-%m-%d")
 
+##    print data
+
     #print round(temperature_sfc, 1) round to one place
-#   Write data to archive
+    #Write data to archive
     log = open('/root/' + filename + '.csv', 'a')
     log.write(data)
     log.close()
 
-#   Write current data
+    #Write current data
     log2 = open('/root/wxdata.csv', 'w')
     log2.write(data)
     log2.close()
