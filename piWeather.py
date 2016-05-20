@@ -84,14 +84,14 @@ def callback_windsp_10m(channel):
 def callback_precip(channel):
 
     global precip_pulse_cnt
-    #precip_pulse_cnt = precip_pulse_cnt + 1  # each tip 1/100 inch
-    f = open('/home/weewx/bin/rain.log', 'a')
-    datetime = strftime("%Y-%m-%d %H:%M:%S ", localtime())
-    f.write(datetime + ' Precip detected 0.01 \n')
-    f.close()
+    precip_pulse_cnt = precip_pulse_cnt + 1  # each tip 1/100 inch
+    #f = open('/home/weewx/bin/rain.log', 'a')
+    #datetime = strftime("%Y-%m-%d %H:%M:%S ", localtime())
+    #f.write(datetime + ' Precip detected 0.01 \n')
+    #f.close()
 
     # turn off precip until error fixed. Make sure to turn it on below as well 
-    precip_pulse_cnt = 0
+    #precip_pulse_cnt = 0
 
 
 # monitor GPIO for pulses from wind sensor
