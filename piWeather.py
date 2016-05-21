@@ -61,8 +61,8 @@ wind_dir_offset = 0  # Degrees to rotate CC to equal actual direction.
 
 
 # Precipitation
-precip_port = 27
-precip_multi = 0.0254  # Centimeters per tip
+precip_port = 23
+precip_multi = 0.000393701  # @@ Davis is .01mm or 0.000393701 inches per tip
 
 # ------------------END OF CONFIGURATION --------------------
 
@@ -72,7 +72,8 @@ GPIO.setwarnings(False)
 GPIO.setup(17, GPIO.OUT)  # Rain activity (Blue)
 GPIO.setup(18, GPIO.OUT)  # Status activity (green)
 GPIO.setup(wind_10m_GPIO_port, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
-GPIO.setup(precip_port, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+#GPIO.setup(precip_port, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+GPIO.setup(precip_port, GPIO.IN)
 
 # Function that counts pulses from 10m wind sensor
 def callback_windsp_10m(channel):
@@ -103,7 +104,8 @@ GPIO.add_event_detect(wind_10m_GPIO_port,
 
 # Monitor GPIO for Rain
 GPIO.add_event_detect(precip_port,
-                      GPIO.FALLING,
+                      #GPIO.FALLING,
+                      GPIO.RISING,
                       callback=callback_precip,
                       bouncetime=300)
 
@@ -130,9 +132,9 @@ def get_sfc_pres():
 # Function to get data from Rain Gauge
 def get_precip():
     global precip_pulse_cnt
-#    precip = precip_pulse_cnt * precip_multi
-#    precip_pulse_cnt = 0
-    precip = None   
+    precip = precip_pulse_cnt * precip_multi
+    precip_pulse_cnt = 0
+#    precip = None   
     return precip
 
 
@@ -179,9 +181,10 @@ def get_pi_temp():
     f = open('/sys/class/thermal/thermal_zone0/temp', 'r')
     input = f.readline()
     if input:
-        system_temp = float(input) / 1000
+        s_temp = float(input) / 1000
     else:
         system_temp = None
+    system_temp = 9.0/5.0 * s_temp + 32
     return system_temp
 
 
@@ -225,7 +228,7 @@ while True:
     lightning_distance = 0	
 
 
-    data = "datetime=%s \nbarometer=%s \nwindSpeed=%s \nwindDir=%s \noutTemp=%s \noutHumidity=%s \nrain=%s \ntotal_lightning=%s \nlightning_distance=%s \nUV=%s \nproc_time=%s \nsystem_temp=%s \nwindGust=%s \n" % (
+    data = "datetime=%s \nbarometer=%s \nwindSpeed=%s \nwindDir=%s \noutTemp=%s \noutHumidity=%s \nrain=%s \ntotal_lightning=%s \nlightning_distance=%s \nUV=%s \nproc_time=%s \ninTemp=%s \nwindGust=%s \n" % (
            datetime, pressure_sfc, windspd_10m,
            winddir_10m, temperature_sfc, humidity_sfc,
            precip_sfc, total_lightning, lightning_distance,
