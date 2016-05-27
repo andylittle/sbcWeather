@@ -62,7 +62,7 @@ void loop() {
     Serial.println("DHT sensor read failure!");
     return;
   }
-  
+//Perhaps byte pointer http://forum.arduino.cc/index.php?topic=112597.0  
   
   int outTEM = (dht.temperature_F * 100);
   int inHUM = (dht.humidity * 100);
